@@ -255,43 +255,6 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.base_url }}/accounts/{{ _.accountId }}"
-        name: Delete an account
-        meta:
-          id: req_29dbeb2810964fe0aae5367d4fad6a36
-          created: 1756833794231
-          modified: 1756833944759
-          isPrivate: false
-          description: ""
-          sortKey: -1756833794231
-        method: DELETE
-        headers:
-          - name: User-Agent
-            value: insomnia/11.5.0
-        scripts:
-          preRequest: >-
-            // Extract account_id from the response and store it in the
-            environment
-
-            let data = insomnia.response.json();
-
-            insomnia.environment.set("accountId", data.account_id);
-
-
-            console.log(`Response status: ${insomnia.response.code}`);
-
-            if (insomnia.response.code !== 201) {
-              console.log("Warning: Unexpected status code");
-            }
-          afterResponse: insomnia.environment.unset("accoundId")
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
   - name: health
     meta:
       id: fld_a55a722f9452423d9fdf011ba06a46be
@@ -566,36 +529,6 @@ spec:
                       value:
                         error_code: INTERNAL_ERROR
                         message: "Failed to retrieve account: Internal server error occurred"
-        delete:
-          tags:
-            - accounts
-          operationId: deleteAccount
-          summary: Delete an account
-          description: Permanently removes the specified account and all associated data.
-            This operation cannot be undone.
-          parameters:
-            - name: accountId
-              in: path
-              required: true
-              description: The UUID of the account to delete
-              schema:
-                type: string
-                format: uuid
-          responses:
-            "204":
-              description: Account successfully deleted (no content returned)
-            "404":
-              description: Account not found
-              content:
-                application/json:
-                  schema:
-                    $ref: "#/components/schemas/ErrorResponse"
-            "500":
-              description: Internal server error
-              content:
-                application/json:
-                  schema:
-                    $ref: "#/components/schemas/ErrorResponse"
       /accounts/{accountId}/debit:
         post:
           tags:
@@ -845,7 +778,7 @@ spec:
   meta:
     id: spc_66aba6477e9048ab8cd85d3ac4d28496
     created: 1756758805299
-    modified: 1756836876088
+    modified: 1756837005611
 testSuites:
   - name: Accounts API Test Suite
     meta:
@@ -946,18 +879,3 @@ testSuites:
 
           const account = JSON.parse(response.data);
           expect(account).to.have.property('account_id').that.is.a('string');
-      - name: Returns 200
-        meta:
-          id: ut_ee665e73388a4cb393a9f31b032952d9
-          created: 1756833963760
-          modified: 1756833993249
-          sortKey: -1756833963760
-        requestId: req_29dbeb2810964fe0aae5367d4fad6a36
-        code: >-
-          const response = await insomnia.send();
-
-
-          expect(response.status).to.equal(204);
-
-          expect(response.data).to.satisfy((body) => body === '' || body ===
-          null);
